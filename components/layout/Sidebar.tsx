@@ -44,7 +44,13 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
       >
         <div className="h-16 flex items-center px-8 ">
           <div className="flex items-center gap-3">
-            <Image src="/uenrlogo.png" alt="logo" width={20} height={20} />
+            <Image
+              src="/uenrlogo.png"
+              alt="logo"
+              width={20}
+              height={20}
+              priority
+            />
             <span className="font-light text-xl tracking-tight text-neutral-900">
               Student Portal
             </span>

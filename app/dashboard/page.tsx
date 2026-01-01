@@ -1,4 +1,6 @@
 "use client";
+
+import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { ProposalStatus } from "@/types/proposal";
 import DraftState from "@/components/dahboard/states/DraftState";
@@ -19,7 +21,8 @@ const steps: ProposalStatus[] = [
 const getStepIndex = (status: ProposalStatus) => steps.indexOf(status);
 
 const DashboardPage = () => {
-  const status: ProposalStatus = "accepted";
+  const [status] = useState<ProposalStatus>("accepted");
+
   return (
     <DashboardLayout>
       <div className="pb-20 font-sans">
