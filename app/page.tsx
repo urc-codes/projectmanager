@@ -1,4 +1,4 @@
-import { Cpu, ArrowRight, Z } from "lucide-react";
+import { Cpu, ArrowRight } from "lucide-react";
 import { uenrlogo } from "@/public/images";
 import Image from "next/image";
 import Link from "next/link";
