@@ -1,4 +1,5 @@
 "use client";
+import { uenrlogo } from "@/public/images";
 import { X, LogOut, LayoutDashboard, UserPlus, FileStack } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -44,13 +45,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
       >
         <div className="h-16 flex items-center px-8 ">
           <div className="flex items-center gap-3">
-            <Image
-              src="/uenrlogo.png"
-              alt="logo"
-              width={20}
-              height={20}
-              priority
-            />
+            <Image src={uenrlogo} alt="logo" width={20} height={20} priority />
             <span className="font-light text-xl tracking-tight text-neutral-900">
               Student Portal
             </span>
