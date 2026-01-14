@@ -5,10 +5,10 @@ import morgan from "morgan";
 import authRoutes from "./modules/auth/auth.routes";
 import { globalErrorHandler } from "./middleware/error.middleware";
 import { AppError } from "./libs/appError";
+import teamRoutes from "./modules/team/team.routes";
 
 const app = express();
 
-// All Middlewares
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/teams", teamRoutes);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
-import { User } from "../modules/auth/auth.model";
 import { AppError } from "../libs/appError";
+import { User } from "../modules/auth/auth.model";
 
 declare global {
   namespace Express {
@@ -27,7 +27,7 @@ export const protect = async (
   }
 
   if (!token) {
-    return next(new AppError("You are not logged in. Please log in.", 401));
+    return next(new AppError("you are not logged in, please log in", 401));
   }
 
   try {
@@ -36,7 +36,7 @@ export const protect = async (
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
       return next(
-        new AppError("The user no longer exists.", 401)
+        new AppError("The user belonging to this token no longer exists.", 401)
       );
     }
 
