@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
+    "ignoreDeprecations": "5.0",
     "moduleResolution": "node",
     "rootDir": "./src",
     "outDir": "./dist",
