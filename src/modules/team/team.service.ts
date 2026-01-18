@@ -6,11 +6,16 @@ import { sendEmail } from "../../libs/email";
 import { Types } from "mongoose";
 
 export const createTeam = async (leaderId: string, name: string) => {
-  const existingTeam = await Team.findOne({ leader: leaderId });
-  if (existingTeam) {
-    throw new AppError("You have already created a team.", 400);
-  }
+  const existingTeam = await Team.findOne({
+    $or: [{ leader: leaderId }, { members: leaderId }],
+  });
 
+  if (existingTeam) {
+    throw new AppError(
+      "You are already part of a team. Leave it to create a new one.",
+      400
+    );
+  }
 
   return await Team.create({
     leader: leaderId,
@@ -22,7 +27,7 @@ export const createTeam = async (leaderId: string, name: string) => {
 export const getMyTeam = async (userId: string) => {
   const team = await Team.findOne({
     $or: [{ leader: userId }, { members: userId }],
-  }).populate("members", "email indexNumber role"); 
+  }).populate("members", "email indexNumber role");
 
   if (!team) {
     throw new AppError("You are not part of any team.", 404);
@@ -30,54 +35,134 @@ export const getMyTeam = async (userId: string) => {
   return team;
 };
 
-// Invite Member
+
+
+
+
+
+
+
+
+
+
 export const inviteMember = async (leaderId: string, email: string) => {
   const team = await Team.findOne({ leader: leaderId });
   if (!team)
     throw new AppError("Only the team leader can invite members.", 403);
 
   const existingUser = await User.findOne({ email });
-
-  if (existingUser) {
-    if (team.members.includes(existingUser._id as Types.ObjectId)) {
-      throw new AppError("User is already in your team.", 400);
-    }
-    const inOtherTeam = await Team.findOne({ members: existingUser._id });
-    if (inOtherTeam)
-      throw new AppError("User is already in another team.", 400);
-
-    team.members.push(existingUser._id as Types.ObjectId);
-    await team.save();
-    await sendEmail(
-      email,
-      "Team Added",
-      `You have been added to Team ${team.name}`
-    );
-    return { message: "User existed and was added to the team." };
-  } else {
-    const existingInvite = await TeamInvite.findOne({
-      teamId: team._id,
-      email,
-    });
-    if (existingInvite)
-      throw new AppError("Invite already sent to this email.", 400);
-
-    await TeamInvite.create({
-      teamId: team._id,
-      email,
-    });
-
-    await sendEmail(
-      email,
-      "Join my Team!",
-      `You have been invited to join Team ${team.name}. Please Sign Up with this email to be automatically added.`
-    );
-
-    return { message: "Invite sent! User will be added upon signup." };
+  if (
+    existingUser &&
+    team.members.includes(existingUser._id as Types.ObjectId)
+  ) {
+    throw new AppError("User is already in your team.", 400);
   }
+
+  const existingInvite = await TeamInvite.findOne({ teamId: team._id, email });
+  if (existingInvite)
+    throw new AppError("Invite already sent to this email.", 400);
+
+  await TeamInvite.create({
+    teamId: team._id,
+    email,
+    status: "PENDING",
+  });
+
+  await sendEmail(
+    email,
+    "Team Invitation",
+    `You have been invited to join Team "${team.name}". \n\nPlease log in to your account and go to "My Invites" to ACCEPT or DECLINE.`
+  );
+
+  return { message: "Invitation sent. Status: PENDING" };
 };
 
-// Remove Member
+
+
+
+
+
+
+
+
+
+
+export const getMyInvites = async (email: string) => {
+  const invites = await TeamInvite.find({ email, status: "PENDING" }).populate(
+    "teamId",
+    "name leader"
+  ); 
+  return invites;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const respondToInvite = async (
+  userId: string,
+  userEmail: string,
+  inviteId: string,
+  action: "ACCEPT" | "DECLINE"
+) => {
+  const invite = await TeamInvite.findById(inviteId);
+  if (!invite)
+    throw new AppError("Invite not found or already processed.", 404);
+
+  if (invite.email !== userEmail) {
+    throw new AppError("This invite does not belong to you.", 403);
+  }
+
+  if (action === "DECLINE") {
+    await TeamInvite.findByIdAndDelete(inviteId);
+    return { message: "Invitation declined." };
+  }
+
+  const existingTeam = await Team.findOne({
+    $or: [{ leader: userId }, { members: userId }],
+  });
+  if (existingTeam) {
+    throw new AppError(
+      `You are already in team "${existingTeam.name}". You must leave it before accepting a new invite.`,
+      400
+    );
+  }
+
+  const team = await Team.findById(invite.teamId);
+  if (!team) {
+    await TeamInvite.findByIdAndDelete(inviteId); // Cleanup dead invite
+    throw new AppError("The team no longer exists.", 404);
+  }
+
+  team.members.push(new Types.ObjectId(userId));
+  await team.save();
+
+  await TeamInvite.findByIdAndDelete(inviteId);
+
+  return { message: `You have successfully joined Team ${team.name}` };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const removeMember = async (
   leaderId: string,
   userIdToRemove: string
@@ -96,19 +181,4 @@ export const removeMember = async (
   await team.save();
 
   return team;
-};
-
-export const processInvitesOnSignup = async (userId: string, email: string) => {
-  const invites = await TeamInvite.find({ email, status: "PENDING" });
-
-  for (const invite of invites) {
-    const team = await Team.findById(invite.teamId);
-    if (team) {
-      team.members.push(new Types.ObjectId(userId));
-      await team.save();
-
-      invite.status = "ACCEPTED";
-      await invite.save();
-    }
-  }
 };

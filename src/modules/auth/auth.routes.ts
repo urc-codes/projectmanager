@@ -2,6 +2,11 @@ import { Router } from "express";
 import * as authController from "./auth.controller";
 import { validate } from "../../middleware/validate.middleware";
 import * as schemas from "./auth.types";
+import { UserRole } from "./auth.types";
+import { protect } from "../../middleware/auth.middleware";
+import { restrictTo } from "../../middleware/role.middleware";
+
+
 
 const router = Router();
 
@@ -14,6 +19,13 @@ router.post(
   "/student/signin",
   validate(schemas.studentSigninSchema),
   authController.studentSignin
+);
+
+router.get(
+  "/student/profile",
+  protect,
+  restrictTo(UserRole.STUDENT),
+  authController.getStudentProfile
 );
 
 router.post(

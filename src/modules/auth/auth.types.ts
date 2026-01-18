@@ -6,7 +6,6 @@ export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
 }
 
-// --- Validation Schemas ---
 
 // Student 
 export const studentSignupSchema = z.object({

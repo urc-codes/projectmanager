@@ -36,6 +36,28 @@ export const studentSignin = async (
   }
 };
 
+export const getStudentProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user;
+    res.status(200).json({
+      status: "Success",
+      data: {
+        _id: user._id,
+        email: user.email,
+        indexNumber: user.indexNumber,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // LECTURER
 export const lecturerSignup = async (
   req: Request,
