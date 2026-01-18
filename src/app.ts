@@ -17,7 +17,7 @@ app.use(morgan("dev"));
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "success",
-    message: "Authentication Backend is running successfully",
+    message: "Backend is running successfully",
   });
 });
 
