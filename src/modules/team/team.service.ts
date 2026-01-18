@@ -2,7 +2,6 @@ import { Team } from "./team.model";
 import { TeamInvite } from "./team.invite.model";
 import { User } from "../auth/auth.model";
 import { AppError } from "../../libs/appError";
-import { sendEmail } from "../../libs/email";
 import { Types } from "mongoose";
 
 export const createTeam = async (leaderId: string, name: string) => {
@@ -58,6 +57,8 @@ export const inviteMember = async (leaderId: string, email: string) => {
     throw new AppError("User is already in your team.", 400);
   }
 
+
+  
   const existingInvite = await TeamInvite.findOne({ teamId: team._id, email });
   if (existingInvite)
     throw new AppError("Invite already sent to this email.", 400);
@@ -68,16 +69,8 @@ export const inviteMember = async (leaderId: string, email: string) => {
     status: "PENDING",
   });
 
-  await sendEmail(
-    email,
-    "Team Invitation",
-    `You have been invited to join Team "${team.name}". \n\nPlease log in to your account and go to "My Invites" to ACCEPT or DECLINE.`
-  );
-
-  return { message: "Invitation sent. Status: PENDING" };
+  return { message: "Invitation created. Status: PENDING" };
 };
-
-
 
 
 

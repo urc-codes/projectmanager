@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
-import { IUser } from "../auth/auth.model";
 
 export interface ITeam extends Document {
   name: string;
