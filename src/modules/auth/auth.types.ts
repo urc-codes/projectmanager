@@ -1,29 +1,29 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export enum UserRole {
-  STUDENT = 'STUDENT',
-  LECTURER = 'LECTURER',
-  SUPER_ADMIN = 'SUPER_ADMIN',
+  STUDENT = "STUDENT",
+  LECTURER = "LECTURER",
+  SUPER_ADMIN = "SUPER_ADMIN",
 }
 
 
-// Student 
+// Student Schemas
 export const studentSignupSchema = z.object({
   body: z.object({
     email: z.string().email(),
-    indexNumber: z.string().min(10),
+    indexNumber: z.string().min(5),
     password: z.string().min(6),
   }),
 });
 
 export const studentSigninSchema = z.object({
   body: z.object({
-    indexNumber: z.string().min(10),
+    indexNumber: z.string().min(5),
     password: z.string().min(1),
   }),
 });
 
-// Lecturer 
+// Lecturer Schemas
 export const lecturerSignupSchema = z.object({
   body: z.object({
     email: z.string().email(),
@@ -38,7 +38,7 @@ export const lecturerSigninSchema = z.object({
   }),
 });
 
-// Admin 
+// Admin Schemas
 export const adminSigninSchema = z.object({
   body: z.object({
     email: z.string().email(),

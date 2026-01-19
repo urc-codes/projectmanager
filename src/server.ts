@@ -13,7 +13,7 @@ const seedAdmin = async () => {
       passwordHash: env.DEFAULT_ADMIN_PASSWORD,
       role: UserRole.SUPER_ADMIN,
     });
-    logger.info(` Default Super Admin created: ${env.DEFAULT_ADMIN_EMAIL}`);
+    logger.info(`Default Super Admin created: ${env.DEFAULT_ADMIN_EMAIL}`);
   }
 };
 
@@ -22,7 +22,7 @@ const startServer = async () => {
   await seedAdmin();
 
   app.listen(env.PORT, () => {
-    logger.info(` Server running on port ${env.PORT}`);
+    logger.info(`Server running on port ${env.PORT}`);
   });
 };
 

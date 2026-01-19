@@ -7,6 +7,7 @@ export interface IUser extends Document {
   indexNumber?: string;
   passwordHash: string;
   role: UserRole;
+  isApproved: boolean; 
   createdAt: Date;
   updatedAt: Date;
   comparePassword(password: string): Promise<boolean>;
@@ -15,15 +16,16 @@ export interface IUser extends Document {
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true },
-    indexNumber: { type: String, sparse: true, unique: true }, 
+    indexNumber: { type: String, sparse: true, unique: true },
     passwordHash: { type: String, required: true },
     role: {
       type: String,
       enum: Object.values(UserRole),
       required: true,
     },
+    isApproved: { type: Boolean, default: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {
@@ -33,7 +35,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (
-  candidatePassword: string
+  candidatePassword: string,
 ) {
   return await bcrypt.compare(candidatePassword, this.passwordHash);
 };
