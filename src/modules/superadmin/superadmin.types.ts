@@ -8,3 +8,24 @@ export const approveLecturerSchema = z.object({
     }),
   }),
 });
+
+
+
+export const toggleWindowSchema = z.object({
+  body: z.object({
+    isOpen: z.boolean({ required_error: "isOpen is required (true/false)" }),
+  }),
+});
+
+export const reassignSupervisorSchema = z.object({
+  params: z.object({
+    submissionId: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: "Invalid Submission ID",
+    }),
+  }),
+  body: z.object({
+    newSupervisorId: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: "Invalid Supervisor ID",
+    }),
+  }),
+});
